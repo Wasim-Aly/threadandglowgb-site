@@ -3,7 +3,7 @@
 *{box-sizing:border-box}html{scroll-behavior:smooth}
 body{margin:0;font-family:'Josefin Sans',system-ui,sans-serif;color:var(--text);background:var(--page-bg);line-height:1.6}
 img{max-width:100%;display:block}a{color:inherit}
-h1,h2,h3{font-family:'Cormorant Garamond',Georgia,serif;color:var(--choc);line-height:1.1;margin:0 0 .5em}
+h1,h2,h3{font-family:'Cormorant Garamond',Georgia,serif;color:var(--heading);line-height:1.1;margin:0 0 .5em}
 h1{font-size:clamp(2.4rem,6vw,4.4rem)}h2{font-size:clamp(1.9rem,4vw,2.8rem)}
 .wrap{max-width:1180px;margin:0 auto;padding:0 20px}section{padding:72px 0}
 .bar{background:var(--choc);color:var(--ivory);text-align:center;font-size:.85rem;letter-spacing:.12em;padding:8px}
@@ -32,7 +32,7 @@ header{position:sticky;top:0;z-index:20;background:var(--header-bg);backdrop-fil
 .card{background:var(--surface-raised);border-radius:var(--r);overflow:hidden;border:1px solid var(--border);display:flex;flex-direction:column;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
 .card:hover{transform:translateY(-5px);box-shadow:0 14px 30px rgba(43,29,23,.14);border-color:var(--copper)}
 .card img{aspect-ratio:1;object-fit:cover;transition:transform .45s ease}.card:hover img{transform:scale(1.025)}.card div{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1}
-.card h3{font-size:1.4rem;margin:0}.card p{margin:0;font-size:.92rem;flex:1}.price{font-weight:700;color:var(--terra)}
+.card h3{font-size:1.4rem;margin:0}.card p{margin:0;font-size:.92rem;flex:1}.price{font-weight:700;color:var(--terra)}.availability{font-size:.82rem;color:var(--muted)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}.two img{border-radius:var(--r);transition:transform .4s ease}.two img:hover{transform:translateY(-4px)}
 .alt-bg{background:var(--surface)}
 .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;counter-reset:s}.steps div{background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--r);padding:24px;transition:transform .25s ease,box-shadow .25s ease}.steps div:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(43,29,23,.12)}
@@ -54,7 +54,8 @@ footer{background:#1E1411;color:#cbb99a;padding:34px 20px 16px;font-size:.9rem}
 #drawer{position:fixed;top:0;right:-440px;width:min(420px,100%);height:100%;background:var(--surface-raised);color:var(--text);z-index:40;box-shadow:-8px 0 30px rgba(0,0,0,.25);transition:right .3s;display:flex;flex-direction:column;padding:20px}
 #drawer.open{right:0}#items{flex:1;overflow:auto}.line{display:flex;gap:10px;align-items:center;border-bottom:1px solid #eee;padding:10px 0}.line img{width:60px;border-radius:8px}.line span{flex:1}
 .line{border-color:var(--border)}.q button{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer}
-.wa{position:fixed;right:18px;bottom:18px;z-index:30;background:#25D366;color:#fff;padding:14px 20px;border-radius:40px;text-decoration:none;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.wa{position:fixed;right:18px;bottom:18px;z-index:30;background:#075E54;color:#fff;padding:14px 20px;border-radius:40px;text-decoration:none;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.25);transition:transform .2s ease,box-shadow .2s ease}
+.wa:hover{transform:translateY(-2px);box-shadow:0 9px 22px rgba(0,0,0,.32)}
 @media(max-width:860px){.hero .wrap,.two,.contact .wrap{grid-template-columns:1fr}.steps,.trust .wrap{grid-template-columns:repeat(2,minmax(0,1fr))}.nav ul{display:none;position:absolute;top:80px;left:0;right:0;background:var(--page-bg);color:var(--text);flex-direction:column;padding:20px;gap:14px;border-bottom:1px solid var(--border)}.nav ul.open{display:flex}#menu{display:block}.footer-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.footer-grid{grid-template-columns:1fr;gap:22px}.trust .wrap{gap:20px 12px}.trust-item{flex-direction:column;gap:6px;font-size:.78rem;line-height:1.35}.trust-item img{width:34px;height:34px;flex-basis:34px}.message-actions{flex-direction:column}.message-actions .btn{flex-basis:auto;width:100%}}
 

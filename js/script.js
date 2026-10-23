@@ -21,7 +21,7 @@ if(persist)saveTheme(dark?'dark':'light')}
 function watchReveal(elements){if(!('IntersectionObserver'in window))return;
 if(!revealObserver)revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');revealObserver.unobserve(entry.target)}}),{threshold:.12});
 elements.forEach((element,index)=>{if(element.classList.contains('reveal'))return;element.style.setProperty('--reveal-delay',`${Math.min(index%4,3)*70}ms`);element.classList.add('reveal');revealObserver.observe(element)})}
-function render(){$('#grid').innerHTML=P.filter(x=>cat==='All'||x.c===cat).map(x=>`<article class="card"><img loading="lazy" src="images/${x.i}.jpg" alt="${x.n}, handmade by Thread & Glow GB"><div><h3>${x.n}</h3><p>${x.d}</p><span class="price">${money(x.p)}</span><button class="btn" onclick="add(${x.id})">Add to cart</button></div></article>`).join('');
+function render(){$('#grid').innerHTML=P.filter(x=>cat==='All'||x.c===cat).map(x=>`<article class="card"><img loading="lazy" src="images/${x.i}.jpg" alt="${x.n}, handmade by Thread & Glow GB"><div><h3>${x.n}</h3><p>${x.d}</p><span class="price">${money(x.p)}</span>${x.p===null?'<span class="availability">Price and availability are confirmed on WhatsApp.</span>':''}<button class="btn" onclick="add(${x.id})">Add to cart</button></div></article>`).join('');
 document.querySelectorAll('.cat').forEach(b=>b.classList.toggle('on',b.dataset.c===cat));watchReveal(document.querySelectorAll('#grid .card'))}
 function save(){localStorage.setItem('tg',JSON.stringify(cart));draw()}
 function add(id){cart[id]=(cart[id]||0)+1;save();$('#drawer').classList.add('open')}
