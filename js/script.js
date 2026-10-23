@@ -32,7 +32,10 @@ const allPriced=ids.length>0&&ids.every(k=>P.find(p=>p.id==k).p!==null);const t=
 $('#total').textContent=allPriced?'Total: Rs '+t.toLocaleString():ids.length?'Final prices and delivery are confirmed on WhatsApp.':''}
 function checkout(){const ids=Object.keys(cart);if(!ids.length)return;const l=ids.map(k=>`- ${P.find(p=>p.id==k).n} x ${cart[k]}`).join('\n');
 open(`https://wa.me/${WA}?text=`+encodeURIComponent(`Assalamualaikum! I would like to order from Thread & Glow GB:\n${l}\n\nPlease confirm availability, prices, delivery and payment details.\nName:\nCity & address:`),'_blank')}
-function sendForm(e){e.preventDefault();const f=e.target;const data=new FormData(f);open(`https://wa.me/${WA}?text=`+encodeURIComponent(`Hello Thread & Glow GB, I am ${data.get('name')}. ${data.get('msg')}`),'_blank')}
+function createEmailLink(name,message){const subject='Website enquiry - Thread & Glow GB';const body=`Hello Thread & Glow GB,\n\nI am ${name}.\n\n${message}`;return `mailto:threadandglow.gb@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`}
+function sendForm(e){e.preventDefault();const f=e.target;const data=new FormData(f);const name=String(data.get('name')).trim(),message=String(data.get('msg')).trim();
+if(data.get('channel')==='email'){window.location.href=createEmailLink(name,message);return}
+open(`https://wa.me/${WA}?text=`+encodeURIComponent(`Hello Thread & Glow GB, I am ${name}. ${message}`),'_blank')}
 document.querySelectorAll('.cat').forEach(b=>b.onclick=()=>{cat=b.dataset.c;render()});
 $('#cartbtn').onclick=()=>$('#drawer').classList.add('open');$('#close').onclick=()=>$('#drawer').classList.remove('open');
 $('#menu').onclick=()=>{const open=$('#nav').classList.toggle('open');$('#menu').setAttribute('aria-expanded',String(open))};document.querySelectorAll('#nav a').forEach(a=>a.onclick=()=>{$('#nav').classList.remove('open');$('#menu').setAttribute('aria-expanded','false')});

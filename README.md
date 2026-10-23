@@ -1,6 +1,6 @@
 # Thread & Glow GB
 
-A static storefront for handmade crochet and Himalayan salt-lamp products from Gilgit-Baltistan. Product enquiries and orders are handled through WhatsApp.
+A static storefront for handmade crochet and Himalayan salt-lamp products from Gilgit-Baltistan. Customers can contact the store through WhatsApp or email at threadandglow.gb@gmail.com.
 
 ## Run locally
 
