@@ -41,20 +41,24 @@ details{background:var(--surface-raised);border:1px solid var(--border);border-r
 details[open] p{animation:faq-enter .25s ease both}
 @keyframes faq-enter{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .contact{background:var(--choc);color:var(--ivory)}.contact h2,.contact h3{color:var(--ivory)}.contact .eyebrow{color:#D5B47A}.contact .wrap{display:grid;grid-template-columns:1.1fr 1fr;gap:40px}.contact a:hover,footer a:hover{color:#D5B47A}
+.contact-methods,.social-links{display:grid;gap:10px;margin-top:20px}.contact-methods a,.social-links a{display:flex;align-items:center;gap:10px;width:fit-content;text-decoration:none}.contact-methods img,.social-links img,.footer-contact-link img{width:22px;height:22px;flex:0 0 22px}.social-links p{margin:0 0 2px}
 form{display:grid;gap:12px}input,textarea{padding:13px;border-radius:10px;border:1px solid #cdb88f;background:var(--surface-raised);color:var(--text);font:inherit;width:100%}
 input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
 .message-actions{display:flex;flex-wrap:wrap;gap:12px}.message-actions .btn{flex:1 1 190px;text-align:center}.message-actions .email-btn{background:transparent;color:var(--ivory);border:2px solid var(--ivory)}.message-actions .email-btn:hover{background:var(--ivory);color:var(--choc)}
+.message-actions .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px}.message-actions .btn img{width:20px;height:20px;flex:0 0 20px}
 footer{background:#1E1411;color:#cbb99a;padding:34px 20px 16px;font-size:.9rem}
 .footer-grid{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:32px}
 .footer-grid h3{color:var(--ivory);font-size:1.2rem;margin:0 0 12px}
 .footer-grid a{display:block;text-decoration:none;margin:0 0 8px}
+.footer-grid a.footer-contact-link{display:flex;align-items:center;gap:9px;width:fit-content}
 .footer-brand p{max-width:250px;margin:0}
 .footer-brand .flogo{margin:0 0 10px}
 .footer-bottom{text-align:center;border-top:1px solid #49372d;margin:28px auto 0;padding-top:14px;font-size:.82rem}
 #drawer{position:fixed;top:0;right:-440px;width:min(420px,100%);height:100%;background:var(--surface-raised);color:var(--text);z-index:40;box-shadow:-8px 0 30px rgba(0,0,0,.25);transition:right .3s;display:flex;flex-direction:column;padding:20px}
 #drawer.open{right:0}#items{flex:1;overflow:auto}.line{display:flex;gap:10px;align-items:center;border-bottom:1px solid #eee;padding:10px 0}.line img{width:60px;border-radius:8px}.line span{flex:1}
 .line{border-color:var(--border)}.q button{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer}
-.wa{position:fixed;right:18px;bottom:18px;z-index:30;background:#075E54;color:#fff;padding:14px 20px;border-radius:40px;text-decoration:none;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.25);transition:transform .2s ease,box-shadow .2s ease}
+.wa{position:fixed;right:18px;bottom:18px;z-index:30;display:flex;align-items:center;gap:9px;background:#075E54;color:#fff;padding:14px 20px;border-radius:40px;text-decoration:none;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.25);transition:transform .2s ease,box-shadow .2s ease}
+.wa img{width:22px;height:22px;flex:0 0 22px}
 .wa:hover{transform:translateY(-2px);box-shadow:0 9px 22px rgba(0,0,0,.32)}
 @media(max-width:860px){.hero .wrap,.two,.contact .wrap{grid-template-columns:1fr}.steps,.trust .wrap{grid-template-columns:repeat(2,minmax(0,1fr))}.nav ul{display:none;position:absolute;top:80px;left:0;right:0;background:var(--page-bg);color:var(--text);flex-direction:column;padding:20px;gap:14px;border-bottom:1px solid var(--border)}.nav ul.open{display:flex}#menu{display:block}.footer-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.footer-grid{grid-template-columns:1fr;gap:22px}.trust .wrap{gap:20px 12px}.trust-item{flex-direction:column;gap:6px;font-size:.78rem;line-height:1.35}.trust-item img{width:34px;height:34px;flex-basis:34px}.message-actions{flex-direction:column}.message-actions .btn{flex-basis:auto;width:100%}}
