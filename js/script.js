@@ -1,16 +1,17 @@
 const WA='923118500841';
 // Add real prices below (number, in PKR). null shows "Ask for price".
 const P=[
-{id:1,n:'Heart Salt Lamp',c:'Salt Lamps',i:'heart-salt-lamp',d:'Heart-shaped Himalayan salt lamp, a warm and thoughtful gift.',p:null},
-{id:2,n:'Sphere Salt Lamp',c:'Salt Lamps',i:'sphere-salt-lamp',d:'Round Himalayan salt lamp with a soft glowing centre.',p:null},
-{id:3,n:'Cylinder Salt Lamp',c:'Salt Lamps',i:'cylinder-salt-lamp',d:'Compact cylinder salt lamp for desks and bedside tables.',p:null},
-{id:4,n:'Rose Bucket Bag',c:'Crochet Bags',i:'rose-bucket-bag',d:'Cream crochet bag with handmade crochet roses.',p:null},
-{id:5,n:'Plum Mini Bag',c:'Crochet Bags',i:'plum-mini-bag',d:'Small plum crochet bag with two crochet flowers.',p:null},
-{id:6,n:'Patterned Pouch',c:'Crochet Bags',i:'patterned-pouch',d:'Crochet pouch with a cream flower and wrist loop.',p:null},
-{id:7,n:'Crochet Rose Pot',c:'Flowers & Decor',i:'crochet-rose-pot',d:'A crochet rose in a handmade pot that never needs watering.',p:null},
-{id:8,n:'Keychain Set',c:'Keychains',i:'keychain-set',d:'Football and crochet flower keychains, made by hand.',p:null}];
-const $=s=>document.querySelector(s);let cart=JSON.parse(localStorage.getItem('tg')||'{}'),cat='All',revealObserver,themeTimer;
-const money=p=>p?'Rs '+p.toLocaleString():'Ask for price';
+{id:1,n:'Heart Salt Lamp',c:'Salt Lamps',i:'images/heart-salt-lamp.jpg',d:'Heart-shaped Himalayan salt lamp, a warm and thoughtful gift.',p:null,stock:null,available:true},
+{id:2,n:'Sphere Salt Lamp',c:'Salt Lamps',i:'images/sphere-salt-lamp.jpg',d:'Round Himalayan salt lamp with a soft glowing centre.',p:null,stock:null,available:true},
+{id:3,n:'Cylinder Salt Lamp',c:'Salt Lamps',i:'images/cylinder-salt-lamp.jpg',d:'Compact cylinder salt lamp for desks and bedside tables.',p:null,stock:null,available:true},
+{id:4,n:'Rose Bucket Bag',c:'Crochet Bags',i:'images/rose-bucket-bag.jpg',d:'Cream crochet bag with handmade crochet roses.',p:null,stock:null,available:true},
+{id:5,n:'Plum Mini Bag',c:'Crochet Bags',i:'images/plum-mini-bag.jpg',d:'Small plum crochet bag with two crochet flowers.',p:null,stock:null,available:true},
+{id:6,n:'Patterned Pouch',c:'Crochet Bags',i:'images/patterned-pouch.jpg',d:'Crochet pouch with a cream flower and wrist loop.',p:null,stock:null,available:true},
+{id:7,n:'Crochet Rose Pot',c:'Flowers & Decor',i:'images/crochet-rose-pot.jpg',d:'A crochet rose in a handmade pot that never needs watering.',p:null,stock:null,available:true},
+{id:8,n:'Keychain Set',c:'Keychains',i:'images/keychain-set.jpg',d:'Football and crochet flower keychains, made by hand.',p:null,stock:null,available:true}];
+const $=s=>document.querySelector(s);let cart=JSON.parse(localStorage.getItem('tg')||'{}'),cat='All',revealObserver,themeTimer,backendReady=false;
+const money=p=>p!==null&&p!==undefined?'Rs '+p.toLocaleString():'Ask for price';
+const escapeHTML=value=>String(value??'').replace(/[&<>"']/g,character=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
 function readTheme(){try{return localStorage.getItem('tg-theme')}catch(error){console.warn('Could not read the saved theme preference.',error);return null}}
 function saveTheme(theme){try{localStorage.setItem('tg-theme',theme)}catch(error){console.warn('Could not save the theme preference.',error)}}
 function setTheme(theme,persist=false){const dark=theme==='dark';document.documentElement.dataset.theme=dark?'dark':'light';
@@ -21,33 +22,60 @@ if(persist)saveTheme(dark?'dark':'light')}
 function watchReveal(elements){if(!('IntersectionObserver'in window))return;
 if(!revealObserver)revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('is-visible');revealObserver.unobserve(entry.target)}}),{threshold:.12});
 elements.forEach((element,index)=>{if(element.classList.contains('reveal'))return;element.style.setProperty('--reveal-delay',`${Math.min(index%4,3)*70}ms`);element.classList.add('reveal');revealObserver.observe(element)})}
-function render(){$('#grid').innerHTML=P.filter(x=>cat==='All'||x.c===cat).map(x=>`<article class="card"><img loading="lazy" src="images/${x.i}.jpg" alt="${x.n}, handmade by Thread & Glow GB"><div><h3>${x.n}</h3><p>${x.d}</p><span class="price">${money(x.p)}</span>${x.p===null?'<span class="availability">Price and availability are confirmed on WhatsApp.</span>':''}<button class="btn" onclick="add(${x.id})">Add to cart</button></div></article>`).join('');
+function render(){$('#grid').innerHTML=P.filter(x=>cat==='All'||x.c===cat).map(x=>`<article class="card"><img loading="lazy" src="${escapeHTML(x.i)}" alt="${escapeHTML(x.n)}, handmade by Thread & Glow GB"><div><h3>${escapeHTML(x.n)}</h3><p>${escapeHTML(x.d)}</p><span class="price">${money(x.p)}</span>${x.p===null?'<span class="availability">Price and availability are confirmed with us.</span>':''}${!x.available?'<span class="availability sold-out">Currently unavailable</span>':''}<button class="btn" onclick="add(${Number(x.id)})"${!backendReady||!x.available?' disabled':''}>${!backendReady?'Ordering setup pending':!x.available?'Out of stock':'Add to cart'}</button></div></article>`).join('')||'<p class="empty-catalog">The live catalog is temporarily unavailable. Please contact us for product information.</p>';
 document.querySelectorAll('.cat').forEach(b=>b.classList.toggle('on',b.dataset.c===cat));watchReveal(document.querySelectorAll('#grid .card'))}
 function save(){localStorage.setItem('tg',JSON.stringify(cart));draw()}
-function add(id){cart[id]=(cart[id]||0)+1;save();$('#drawer').classList.add('open')}
-function chg(id,d){cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];save()}
-function draw(){const ids=Object.keys(cart);$('#count').textContent=ids.reduce((a,k)=>a+cart[k],0);
-$('#items').innerHTML=ids.length?ids.map(k=>{const x=P.find(p=>p.id==k);return `<div class="line"><img src="images/${x.i}.jpg" alt=""><span>${x.n}<br><small>${money(x.p)}</small></span><span class="q"><button onclick="chg(${k},-1)">-</button> ${cart[k]} <button onclick="chg(${k},1)">+</button></span></div>`}).join(''):'<p>Your cart is empty.</p>';
-$('#checkout-whatsapp').disabled=!ids.length;$('#checkout-email').disabled=!ids.length;
+function add(id){if(!backendReady)return;const product=P.find(p=>p.id===id);if(!product||!product.available)return;if(!cart[id]&&Object.keys(cart).length>=20){setDraftStatus('#checkout-status','Your order can include up to 20 different products.');return}if((cart[id]||0)>=99){setDraftStatus('#checkout-status','The maximum quantity is 99 of each product.');return}if(product.stock!==null&&(cart[id]||0)>=product.stock){setDraftStatus('#checkout-status',`Only ${product.stock} ${product.stock===1?'item is':'items are'} currently available.`);return}cart[id]=(cart[id]||0)+1;save();$('#drawer').classList.add('open')}
+function chg(id,d){const product=P.find(p=>String(p.id)===String(id)),quantity=(cart[id]||0)+d;if(d>0&&quantity>99){setDraftStatus('#checkout-status','The maximum quantity is 99 of each product.');return}if(d>0&&product&&product.stock!==null&&quantity>product.stock){setDraftStatus('#checkout-status',`Only ${product.stock} ${product.stock===1?'item is':'items are'} currently available.`);return}if(quantity<=0)delete cart[id];else cart[id]=quantity;save()}
+function draw(){const ids=Object.keys(cart).filter(k=>P.some(p=>String(p.id)===String(k)));cart=Object.fromEntries(ids.map(k=>[k,cart[k]]));$('#count').textContent=ids.reduce((a,k)=>a+cart[k],0);
+$('#items').innerHTML=ids.length?ids.map(k=>{const x=P.find(p=>String(p.id)===String(k));return `<div class="line"><img src="${escapeHTML(x.i)}" alt=""><span>${escapeHTML(x.n)}<br><small>${money(x.p)}</small></span><span class="q"><button onclick="chg(${Number(k)},-1)" aria-label="Remove one ${escapeHTML(x.n)}">-</button> ${cart[k]} <button onclick="chg(${Number(k)},1)" aria-label="Add one ${escapeHTML(x.n)}">+</button></span></div>`}).join(''):'<p>Your cart is empty.</p>';
+$('#checkout-whatsapp').disabled=!ids.length||!backendReady;$('#checkout-email').disabled=!ids.length||!backendReady;
 const allPriced=ids.length>0&&ids.every(k=>P.find(p=>p.id==k).p!==null);const t=ids.reduce((a,k)=>a+(P.find(p=>p.id==k).p||0)*cart[k],0);
 $('#total').textContent=allPriced?'Estimated item total: Rs '+t.toLocaleString():ids.length?'Final prices and delivery are confirmed with us.':''}
-function buildOrderMessage(){const ids=Object.keys(cart);if(!ids.length)return null;const form=$('#checkout-details');if(!form.reportValidity())return null;
-const data=new FormData(form),name=String(data.get('name')).trim(),city=String(data.get('city')).trim(),address=String(data.get('address')).trim(),notes=String(data.get('notes')).trim();
-const lines=ids.map(k=>{const product=P.find(p=>p.id==k);return `- ${product.n} x ${cart[k]}${product.p===null?' — price to confirm':` — Rs ${product.p.toLocaleString()} each`}`}).join('\n');
-const allPriced=ids.every(k=>P.find(p=>p.id==k).p!==null),total=ids.reduce((sum,k)=>sum+(P.find(p=>p.id==k).p||0)*cart[k],0);
-return `Assalamualaikum Thread & Glow GB,\n\nI’d like to request the following order:\n${lines}${allPriced?`\nEstimated item total: Rs ${total.toLocaleString()}`:''}\n\nName: ${name}\nCity: ${city}${address?`\nDelivery address: ${address}`:''}${notes?`\nOrder notes: ${notes}`:''}\n\nPlease confirm availability, final price, delivery charges and payment options. I understand this is an order request, not a confirmed purchase.`}
-function createOrderLink(channel,message){if(channel==='email'){const subject='Order request - Thread & Glow GB';return `mailto:threadandglow.gb@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`}
+function buildOrderPayload(channel){const ids=Object.keys(cart);if(!ids.length)return null;const form=$('#checkout-details');if(!form.reportValidity())return null;
+const data=new FormData(form);return{name:String(data.get('name')).trim(),city:String(data.get('city')).trim(),contactMethod:String(data.get('contactMethod')),contactValue:String(data.get('contactValue')).trim(),address:String(data.get('address')).trim(),notes:String(data.get('notes')).trim(),items:ids.map(id=>({id:Number(id),quantity:cart[id]})),channel,website:String(data.get('website')||'')}}
+function orderMessage(payload,orderNumber){const lines=payload.items.map(item=>{const product=P.find(p=>p.id===item.id);return `- ${product.n} x ${item.quantity}${product.p===null?' — price to confirm':` — Rs ${product.p.toLocaleString()} each`}`}).join('\n');
+const allPriced=payload.items.every(item=>P.find(p=>p.id===item.id).p!==null),total=payload.items.reduce((sum,item)=>sum+(P.find(p=>p.id===item.id).p||0)*item.quantity,0);
+return `Assalamualaikum Thread & Glow GB,\n\nI submitted order request ${orderNumber}:\n${lines}${allPriced?`\nEstimated item total: Rs ${total.toLocaleString()}`:''}\n\nName: ${payload.name}\nCity: ${payload.city}\nPreferred contact (${payload.contactMethod}): ${payload.contactValue}${payload.address?`\nDelivery address: ${payload.address}`:''}${payload.notes?`\nOrder notes: ${payload.notes}`:''}\n\nPlease confirm availability, final price, delivery charges and payment options.`}
+function createOrderLink(channel,message,orderNumber){if(channel==='email'){const subject=`Order request ${orderNumber} - Thread & Glow GB`;return `mailto:threadandglow.gb@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`}
 return `https://wa.me/${WA}?text=`+encodeURIComponent(message)}
-function checkout(channel){const message=buildOrderMessage();if(!message)return;const link=createOrderLink(channel,message);
-if(channel==='email'){window.location.href=link;return}open(link,'_blank')}
-function createMessageLink(channel,name,message){if(channel==='email'){const subject='Website enquiry - Thread & Glow GB';const body=`Hello Thread & Glow GB,\n\nI am ${name}.\n\n${message}`;return `mailto:threadandglow.gb@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`}
-return `https://wa.me/${WA}?text=`+encodeURIComponent(`Hello Thread & Glow GB, I am ${name}. ${message}`)}
-function sendForm(e){e.preventDefault();const f=e.target;const data=new FormData(f);const name=String(data.get('name')).trim(),message=String(data.get('msg')).trim();const channel=e.submitter&&e.submitter.value==='email'?'email':'whatsapp';const link=createMessageLink(channel,name,message);
-if(channel==='email'){window.location.href=link;return}open(link,'_blank')}
+function setDraftStatus(selector,message,link,label){const element=$(selector);element.replaceChildren(document.createTextNode(message+' '));if(link){const anchor=document.createElement('a');anchor.href=link;anchor.target='_blank';anchor.rel='noopener';anchor.textContent=label;element.append(anchor)}}
+function setContactStatus(selector,message){const element=$(selector),whatsapp=document.createElement('a'),email=document.createElement('a');element.replaceChildren(document.createTextNode(message+' '));whatsapp.href=`https://wa.me/${WA}`;whatsapp.target='_blank';whatsapp.rel='noopener';whatsapp.textContent='WhatsApp';email.href='mailto:threadandglow.gb@gmail.com';email.textContent='Email';element.append(whatsapp,document.createTextNode(' or '),email)}
+async function requestJSON(path,options,fallback){let response;try{response=await fetch(path,options)}catch{throw new Error(fallback)}let data;try{data=await response.json()}catch{throw new Error(fallback)}if(!response.ok)throw new Error(data.error||fallback);return data}
+function updateContactField(){const method=$('#order-contact-method').value,input=$('#order-contact'),label=$('#order-contact-label');
+const isEmail=method==='email';input.type=isEmail?'email':'tel';input.autocomplete=isEmail?'email':'tel';input.placeholder=isEmail?'you@example.com':'+92…';if(isEmail)input.removeAttribute('pattern');else input.pattern='\\+?[0-9\\s\\x28\\x29.\\x2d]{7,20}';input.setCustomValidity('');input.oninput=()=>{const digits=input.value.replace(/\D/g,'').length;input.setCustomValidity(!isEmail&&input.value&&(digits<7||digits>15)?'Enter a WhatsApp number with 7 to 15 digits, including its country code.':'')};input.oninput();label.textContent=isEmail?'Email address':'WhatsApp number (include country code)'}
+async function checkout(channel){const payload=buildOrderPayload(channel);if(!payload)return;
+if(!backendReady){setDraftStatus('#checkout-status','Online order tracking is not configured yet. Please contact the store directly.');return}
+const draftWindow=window.open('about:blank','_blank'),buttons=document.querySelectorAll('.checkout-actions button');buttons.forEach(button=>button.disabled=true);setDraftStatus('#checkout-status','Saving your order request…');
+try{const result=await requestJSON('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)},'We could not save your order. Your cart is still available; please try again.');
+const link=createOrderLink(channel,orderMessage(payload,result.orderNumber),result.orderNumber);
+if(draftWindow){draftWindow.location.href=link}else setDraftStatus('#checkout-status',`Order request ${result.orderNumber} has been saved. Pop-ups are blocked; use this link to continue:`,link,channel==='email'?'Open email draft':'Open WhatsApp draft');
+cart={};save();$('#checkout-details').reset();updateContactField();if(draftWindow)setDraftStatus('#checkout-status',`Order request ${result.orderNumber} saved. Review and send the message draft to contact us.`)
+}catch(error){if(draftWindow)draftWindow.close();setDraftStatus('#checkout-status',error.message||'We could not save your order. Your cart is still available.');console.error('Order request failed.',error)}
+finally{buttons.forEach(button=>button.disabled=!backendReady||Object.keys(cart).length===0)}}
+function createMessageLink(channel,name,message,inquiryNumber){if(channel==='email'){const subject=`Website enquiry ${inquiryNumber} - Thread & Glow GB`;const body=`Hello Thread & Glow GB,\n\nMy enquiry reference is ${inquiryNumber}.\n\nI am ${name}.\n\n${message}`;return `mailto:threadandglow.gb@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`}
+return `https://wa.me/${WA}?text=`+encodeURIComponent(`Hello Thread & Glow GB, my enquiry reference is ${inquiryNumber}. I am ${name}. ${message}`)}
+async function sendForm(e){e.preventDefault();const f=e.target,data=new FormData(f),name=String(data.get('name')).trim(),message=String(data.get('msg')).trim(),replyContact=String(data.get('replyContact')).trim(),channel=e.submitter&&e.submitter.value==='email'?'email':'whatsapp';
+if(!backendReady){setDraftStatus('#message-status','The secure message inbox is not configured yet. Please use the WhatsApp or email links above.');return}
+const draftWindow=window.open('about:blank','_blank'),buttons=f.querySelectorAll('button[type="submit"]');buttons.forEach(button=>button.disabled=true);setDraftStatus('#message-status','Saving your enquiry…');
+try{const result=await requestJSON('/api/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,message,replyContact,channel,website:String(data.get('website')||'')})},'We could not save your message. Please try again.');
+const link=createMessageLink(channel,name,message,result.inquiryNumber);if(draftWindow){draftWindow.location.href=link;setDraftStatus('#message-status',`Enquiry ${result.inquiryNumber} saved. Review and send the message draft.`)}else setDraftStatus('#message-status',`Enquiry ${result.inquiryNumber} saved. Pop-ups are blocked; use this link to continue:`,link,channel==='email'?'Open email draft':'Open WhatsApp draft');
+f.reset()
+}catch(error){if(draftWindow)draftWindow.close();setDraftStatus('#message-status',error.message||'We could not save your message. Please try again.');console.error('Customer enquiry failed.',error)}
+finally{buttons.forEach(button=>button.disabled=false)}}
+async function loadCatalog(){const status=$('#catalog-status');
+try{const config=await requestJSON('/api/config',{cache:'no-store'},'The secure catalog could not be reached. Please contact us directly.');
+if(!config.configured)throw new Error('The secure catalog is not connected yet. Online ordering and order tracking are unavailable; please contact us directly.');
+const data=await requestJSON('/api/products',{cache:'no-store'},'The product catalog could not be loaded. Please contact us directly.');
+P.splice(0,P.length,...data.products.map(product=>({id:Number(product.id),n:product.name,c:product.category,i:product.image_url,d:product.description,p:product.price===null?null:Number(product.price),stock:product.stock,available:product.available})));
+backendReady=true;status.hidden=true;render();draw()
+}catch(error){backendReady=false;status.hidden=false;setContactStatus('#catalog-status',`${error.message} Starter products are shown for reference. Contact us via`);setContactStatus('#checkout-status','Online checkout is currently unavailable. Contact us via');render();draw();console.warn('Live catalog is unavailable.',error)}}
 document.querySelectorAll('.cat').forEach(b=>b.onclick=()=>{cat=b.dataset.c;render()});
 $('#cartbtn').onclick=()=>$('#drawer').classList.add('open');$('#close').onclick=()=>$('#drawer').classList.remove('open');
 $('#checkout-whatsapp').onclick=()=>checkout('whatsapp');$('#checkout-email').onclick=()=>checkout('email');
+$('#order-contact-method').onchange=updateContactField;
+$('#reply-contact').oninput=()=>{const value=$('#reply-contact').value.trim(),isEmail=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),isPhone=/^\+?[0-9\s().-]{7,20}$/.test(value)&&value.replace(/\D/g,'').length>=7&&value.replace(/\D/g,'').length<=15;$('#reply-contact').setCustomValidity(value&&!isEmail&&!isPhone?'Enter a valid email address or phone number, or leave this field blank.':'')};
 $('#menu').onclick=()=>{const open=$('#nav').classList.toggle('open');$('#menu').setAttribute('aria-expanded',String(open))};document.querySelectorAll('#nav a').forEach(a=>a.onclick=()=>{$('#nav').classList.remove('open');$('#menu').setAttribute('aria-expanded','false')});
 $('#theme-toggle').onclick=()=>{document.documentElement.classList.add('theme-transition');setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true);clearTimeout(themeTimer);themeTimer=setTimeout(()=>document.documentElement.classList.remove('theme-transition'),350)};
-$('#yr').textContent=new Date().getFullYear();setTheme(readTheme()==='dark'?'dark':'light');render();draw();
+$('#yr').textContent=new Date().getFullYear();setTheme(readTheme()==='dark'?'dark':'light');updateContactField();render();draw();loadCatalog();
 watchReveal(document.querySelectorAll('main > section .wrap,.trust .wrap,.footer-grid > div'));

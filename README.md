@@ -1,30 +1,54 @@
 # Thread & Glow GB
 
-A static storefront for handmade crochet and Himalayan salt-lamp products from Gilgit-Baltistan. Customers can contact the store through WhatsApp or email at threadandglow.gb@gmail.com.
+A storefront for handmade crochet and Himalayan salt-lamp products from Gilgit-Baltistan. The production order and enquiry flows use Vercel serverless functions and Supabase. Customers submit an order or enquiry to the store database before choosing a WhatsApp or email draft; payment is not collected on the website.
 
-## Run locally
+## Storefront and admin
 
-Open `index.html` in a browser, or serve this folder with any static web server.
+- Storefront: `/`
+- Admin dashboard: `/admin/`
+- Admin users sign in with Supabase Auth and must also be added to the `public.admin_users` allow-list.
+- The dashboard manages order and enquiry statuses, product details, prices, active/visible products, and stock.
+- Blank stock means inventory is not tracked; stock of zero makes a product unavailable. Orders do not reserve or deduct stock automatically.
 
-## Update products
+## Configure Supabase
 
-Edit the product list in `js/script.js`. Set each product's `p` value to its price in PKR; leave it as `null` to show “Ask for price” and confirm the final price on WhatsApp.
+1. Create a Supabase project.
+2. Open the project's SQL Editor and run [`supabase/schema.sql`](./supabase/schema.sql). It creates the tables, access policies, rate-limit function, and starter catalog. Review the product names/images, and add prices and stock in the admin after setup.
+3. In Supabase Authentication, create an account for the store administrator. Disable public sign-up if it is not needed.
+4. Copy that user's UUID from Authentication → Users, then run this in the SQL Editor, replacing the sample UUID:
 
-## Customer messages
+   ```sql
+   insert into public.admin_users (user_id)
+   values ('00000000-0000-0000-0000-000000000000');
+   ```
 
-The cart collects a customer's name and city, then opens a pre-filled order request in WhatsApp or the customer's email app. The customer must review and send that draft; the static website does not receive or automatically reply to incoming messages. To send automatic greetings or away replies in WhatsApp, configure those in the WhatsApp Business app. A fully automated website-side reply requires a secure server and a messaging provider integration; never place provider access tokens in this static site's JavaScript.
+5. Keep the Supabase service-role key private. Never put it in browser JavaScript, commit it, or send it in chat.
 
-Suggested WhatsApp Business greeting:
+## Configure Vercel
 
-> Assalamualaikum! Thank you for contacting Thread & Glow GB. We’ve received your message and will get back to you as soon as possible. For order requests, we’ll confirm product availability, final price, delivery and payment before your order is confirmed.
+In the Vercel project, open **Settings → Environment Variables** and add the following for the environments you will deploy. Values are available in Supabase **Project Settings → API**.
 
-Add it in WhatsApp Business under **Business tools → Greeting message**. An away message can be configured separately for times when you’re unavailable.
+| Variable | Value |
+| --- | --- |
+| `SUPABASE_URL` | Project URL |
+| `SUPABASE_ANON_KEY` | Publishable/anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Secret service-role key |
 
-## Deploy to Vercel
+Redeploy after saving the variables, then visit `/admin/` and sign in. The admin page rejects authenticated users who are not on the allow-list. The storefront will clearly report when the backend is not configured; live checkout stays disabled until the API and database are available.
 
-1. Push this repository to GitHub.
-2. In Vercel, choose **Add New → Project** and import the GitHub repository.
-3. Use the repository root as the Root Directory and choose **Other** as the Framework Preset.
-4. This is a static site: leave the Build Command and Output Directory empty, then deploy.
+An [.env.example](./.env.example) file documents the variable names using placeholders only. Do not replace those placeholders with real keys in a committed file.
 
-Vercel will serve `index.html` from the project root and redeploy when changes are pushed to the connected branch.
+## Deploy
+
+1. Import the GitHub repository into Vercel.
+2. Use the repository root as the Root Directory and **Other** as the Framework Preset.
+3. Leave the Build Command and Output Directory empty. Vercel serves the static storefront and deploys the functions in `api/`.
+4. Add the environment variables above, deploy, and confirm the storefront catalog and `/admin/` work.
+
+Opening `index.html` directly or serving it with a basic static server is useful for layout work, but the API routes are only available after deployment to Vercel (or when using the Vercel development CLI).
+
+## Order and message behavior
+
+An order request is saved in Supabase and assigned a reference before the website opens a prefilled WhatsApp or email draft. The customer must still review and send that draft. If the save fails, the page reports the error and preserves the cart. Enquiries are similarly saved before a draft is opened. Store staff review requests and confirm availability, final pricing, delivery, and payment with the customer.
+
+The website does not automatically send replies to WhatsApp or email. Configure greeting/away messages in WhatsApp Business for automatic WhatsApp responses. Sending automatic email or WhatsApp replies from the website requires a separately configured provider and secure server-side credentials.

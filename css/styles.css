@@ -76,3 +76,13 @@ html.theme-transition *,html.theme-transition *::before,html.theme-transition *:
 @media(max-width:480px){.theme-label{display:none}.theme-toggle{width:40px;height:40px;justify-content:center;padding:0}.nav img{height:48px}}
 :root[data-theme="dark"] .price{color:#e7a08f}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}}
+.store-status,.form-status{padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text)}
+.store-status[hidden]{display:none}
+.form-status:empty{display:none}
+.contact .form-status{background:#362a24;color:var(--ivory);border-color:#6e594c}
+.form-status a{font-weight:700}
+#checkout-details select{padding:10px;border-radius:10px;border:1px solid #cdb88f;background:var(--surface-raised);color:var(--text);font:inherit}
+.honeypot{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.empty-catalog{grid-column:1/-1}
+.sold-out{color:var(--terra)}
+:root[data-theme="dark"] .sold-out{color:#ef9d8b}

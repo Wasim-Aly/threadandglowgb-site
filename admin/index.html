@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#2B1D17">
+  <title>Store admin | Thread &amp; Glow GB</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+  <header class="admin-header">
+    <a class="brand" href="../" aria-label="Thread &amp; Glow GB home">Thread <span>&amp;</span> Glow <small>GB · STORE ADMIN</small></a>
+    <a href="../" class="back-link">View storefront</a>
+  </header>
+  <main class="admin-main">
+    <section id="setup-notice" class="notice" hidden>
+      <h1>Admin setup required</h1>
+      <p>Connect Supabase using the setup steps in the repository README, apply <code>supabase/schema.sql</code>, and configure the three Supabase environment variables in Vercel. Then redeploy this site.</p>
+    </section>
+    <section id="login-panel" class="panel login-panel" hidden>
+      <p class="eyebrow">Private store workspace</p>
+      <h1>Admin sign in</h1>
+      <p>Sign in with an administrator account that has been added to this store.</p>
+      <form id="login-form">
+        <label for="login-email">Email</label>
+        <input id="login-email" type="email" autocomplete="username" required>
+        <label for="login-password">Password</label>
+        <input id="login-password" type="password" autocomplete="current-password" required>
+        <button class="button" type="submit">Sign in securely</button>
+      </form>
+      <p id="login-status" class="status" role="status" aria-live="polite"></p>
+    </section>
+    <section id="dashboard" hidden>
+      <div class="dashboard-title">
+        <div><p class="eyebrow">Thread &amp; Glow GB</p><h1>Store dashboard</h1><p id="admin-identity" class="muted"></p></div>
+        <div class="title-actions"><button id="refresh-button" class="button secondary" type="button">Refresh</button><button id="logout-button" class="button secondary" type="button">Sign out</button></div>
+      </div>
+      <p id="dashboard-status" class="status" role="status" aria-live="polite"></p>
+      <nav class="tabs" aria-label="Store management">
+        <button class="tab active" type="button" data-view="orders">Orders <span id="orders-count" class="count"></span></button>
+        <button class="tab" type="button" data-view="inquiries">Messages <span id="inquiries-count" class="count"></span></button>
+        <button class="tab" type="button" data-view="products">Products &amp; stock</button>
+      </nav>
+      <section id="orders-view" class="view">
+        <div class="view-heading"><div><h2>Order requests</h2><p class="muted">Customer requests are not confirmed orders until you verify and agree the details.</p></div>
+          <label class="filter-label" for="order-filter">Show <select id="order-filter"><option value="all">All orders</option><option value="new">New</option><option value="reviewing">Reviewing</option><option value="confirmed">Confirmed</option><option value="fulfilled">Fulfilled</option><option value="cancelled">Cancelled</option></select></label>
+        </div>
+        <div id="orders-list" class="record-list"></div>
+      </section>
+      <section id="inquiries-view" class="view" hidden>
+        <div class="view-heading"><div><h2>Customer messages</h2><p class="muted">Enquiries submitted through the website contact form.</p></div>
+          <label class="filter-label" for="inquiry-filter">Show <select id="inquiry-filter"><option value="all">All messages</option><option value="new">New</option><option value="replied">Replied</option><option value="closed">Closed</option></select></label>
+        </div>
+        <div id="inquiries-list" class="record-list"></div>
+      </section>
+      <section id="products-view" class="view" hidden>
+        <div class="view-heading"><div><h2>Products &amp; inventory</h2><p class="muted">Set price to blank when it needs confirmation. Blank stock means untracked; zero means sold out.</p></div></div>
+        <form id="new-product-form" class="panel product-form">
+          <h3>Add a product</h3>
+          <div class="form-grid">
+            <label>Name<input name="name" maxlength="120" required></label>
+            <label>Category<select name="category" required><option>Salt Lamps</option><option>Crochet Bags</option><option>Flowers &amp; Decor</option><option>Keychains</option></select></label>
+            <label>Description<textarea name="description" maxlength="2000" rows="2"></textarea></label>
+            <label>Image path<input name="image_url" maxlength="500" placeholder="images/new-product.jpg" required></label>
+            <label>Price (PKR)<input name="price" type="number" min="0" step="0.01" placeholder="Ask for price"></label>
+            <label>Stock quantity<input name="stock" type="number" min="0" step="1" placeholder="Not tracked"></label>
+            <label>Display order<input name="sort_order" type="number" step="1" value="0"></label>
+          </div>
+          <button class="button" type="submit">Add product</button>
+        </form>
+        <div id="products-list" class="product-list"></div>
+      </section>
+    </section>
+  </main>
+  <script src="../js/admin.js"></script>
+</body>
+</html>
