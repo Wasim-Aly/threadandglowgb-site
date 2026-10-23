@@ -28,16 +28,25 @@ function add(id){cart[id]=(cart[id]||0)+1;save();$('#drawer').classList.add('ope
 function chg(id,d){cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];save()}
 function draw(){const ids=Object.keys(cart);$('#count').textContent=ids.reduce((a,k)=>a+cart[k],0);
 $('#items').innerHTML=ids.length?ids.map(k=>{const x=P.find(p=>p.id==k);return `<div class="line"><img src="images/${x.i}.jpg" alt=""><span>${x.n}<br><small>${money(x.p)}</small></span><span class="q"><button onclick="chg(${k},-1)">-</button> ${cart[k]} <button onclick="chg(${k},1)">+</button></span></div>`}).join(''):'<p>Your cart is empty.</p>';
+$('#checkout-whatsapp').disabled=!ids.length;$('#checkout-email').disabled=!ids.length;
 const allPriced=ids.length>0&&ids.every(k=>P.find(p=>p.id==k).p!==null);const t=ids.reduce((a,k)=>a+(P.find(p=>p.id==k).p||0)*cart[k],0);
-$('#total').textContent=allPriced?'Total: Rs '+t.toLocaleString():ids.length?'Final prices and delivery are confirmed on WhatsApp.':''}
-function checkout(){const ids=Object.keys(cart);if(!ids.length)return;const l=ids.map(k=>`- ${P.find(p=>p.id==k).n} x ${cart[k]}`).join('\n');
-open(`https://wa.me/${WA}?text=`+encodeURIComponent(`Assalamualaikum! I would like to order from Thread & Glow GB:\n${l}\n\nPlease confirm availability, prices, delivery and payment details.\nName:\nCity & address:`),'_blank')}
+$('#total').textContent=allPriced?'Estimated item total: Rs '+t.toLocaleString():ids.length?'Final prices and delivery are confirmed with us.':''}
+function buildOrderMessage(){const ids=Object.keys(cart);if(!ids.length)return null;const form=$('#checkout-details');if(!form.reportValidity())return null;
+const data=new FormData(form),name=String(data.get('name')).trim(),city=String(data.get('city')).trim(),address=String(data.get('address')).trim(),notes=String(data.get('notes')).trim();
+const lines=ids.map(k=>{const product=P.find(p=>p.id==k);return `- ${product.n} x ${cart[k]}${product.p===null?' — price to confirm':` — Rs ${product.p.toLocaleString()} each`}`}).join('\n');
+const allPriced=ids.every(k=>P.find(p=>p.id==k).p!==null),total=ids.reduce((sum,k)=>sum+(P.find(p=>p.id==k).p||0)*cart[k],0);
+return `Assalamualaikum Thread & Glow GB,\n\nI’d like to request the following order:\n${lines}${allPriced?`\nEstimated item total: Rs ${total.toLocaleString()}`:''}\n\nName: ${name}\nCity: ${city}${address?`\nDelivery address: ${address}`:''}${notes?`\nOrder notes: ${notes}`:''}\n\nPlease confirm availability, final price, delivery charges and payment options. I understand this is an order request, not a confirmed purchase.`}
+function createOrderLink(channel,message){if(channel==='email'){const subject='Order request - Thread & Glow GB';return `mailto:threadandglow.gb@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`}
+return `https://wa.me/${WA}?text=`+encodeURIComponent(message)}
+function checkout(channel){const message=buildOrderMessage();if(!message)return;const link=createOrderLink(channel,message);
+if(channel==='email'){window.location.href=link;return}open(link,'_blank')}
 function createMessageLink(channel,name,message){if(channel==='email'){const subject='Website enquiry - Thread & Glow GB';const body=`Hello Thread & Glow GB,\n\nI am ${name}.\n\n${message}`;return `mailto:threadandglow.gb@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`}
 return `https://wa.me/${WA}?text=`+encodeURIComponent(`Hello Thread & Glow GB, I am ${name}. ${message}`)}
 function sendForm(e){e.preventDefault();const f=e.target;const data=new FormData(f);const name=String(data.get('name')).trim(),message=String(data.get('msg')).trim();const channel=e.submitter&&e.submitter.value==='email'?'email':'whatsapp';const link=createMessageLink(channel,name,message);
 if(channel==='email'){window.location.href=link;return}open(link,'_blank')}
 document.querySelectorAll('.cat').forEach(b=>b.onclick=()=>{cat=b.dataset.c;render()});
 $('#cartbtn').onclick=()=>$('#drawer').classList.add('open');$('#close').onclick=()=>$('#drawer').classList.remove('open');
+$('#checkout-whatsapp').onclick=()=>checkout('whatsapp');$('#checkout-email').onclick=()=>checkout('email');
 $('#menu').onclick=()=>{const open=$('#nav').classList.toggle('open');$('#menu').setAttribute('aria-expanded',String(open))};document.querySelectorAll('#nav a').forEach(a=>a.onclick=()=>{$('#nav').classList.remove('open');$('#menu').setAttribute('aria-expanded','false')});
 $('#theme-toggle').onclick=()=>{document.documentElement.classList.add('theme-transition');setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark',true);clearTimeout(themeTimer);themeTimer=setTimeout(()=>document.documentElement.classList.remove('theme-transition'),350)};
 $('#yr').textContent=new Date().getFullYear();setTheme(readTheme()==='dark'?'dark':'light');render();draw();
