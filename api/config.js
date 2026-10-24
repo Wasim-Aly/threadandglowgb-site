@@ -6,7 +6,7 @@ module.exports = function configHandler(req, res) {
   const config = getConfig();
   return send(res, 200, {
     configured: config.configured,
-    supabaseUrl: config.url,
-    supabaseAnonKey: config.anonKey,
+    supabaseUrl: config.configured ? config.url : '',
+    supabaseAnonKey: config.configured ? config.anonKey : '',
   });
 };

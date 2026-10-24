@@ -1,14 +1,34 @@
 const { createHash } = require('node:crypto');
 
+function jwtHasRole(key, role) {
+  const parts = key.split('.');
+  if (parts.length !== 3) return false;
+  try {
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'));
+    return payload.role === role;
+  } catch {
+    return false;
+  }
+}
+
 function getConfig() {
-  const url = process.env.SUPABASE_URL || '';
+  const url = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
   const anonKey = process.env.SUPABASE_ANON_KEY || '';
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+  let validUrl = false;
+  try {
+    const parsedUrl = new URL(url);
+    validUrl = parsedUrl.protocol === 'https:' && Boolean(parsedUrl.hostname) &&
+      !parsedUrl.username && !parsedUrl.password &&
+      !/your-project|placeholder|supabase project url/i.test(url);
+  } catch {}
+  const validAnonKey = anonKey.startsWith('sb_publishable_') || jwtHasRole(anonKey, 'anon');
+  const validServiceRoleKey = serviceRoleKey.startsWith('sb_secret_') || jwtHasRole(serviceRoleKey, 'service_role');
   return {
-    url: url.replace(/\/+$/, ''),
+    url,
     anonKey,
     serviceRoleKey,
-    configured: Boolean(url && anonKey && serviceRoleKey),
+    configured: validUrl && validAnonKey && validServiceRoleKey,
   };
 }
 
@@ -17,14 +37,16 @@ async function supabaseRequest(path, options = {}) {
   const key = options.key || config.serviceRoleKey;
   if (!config.url || !key) throw new Error('Supabase server configuration is incomplete.');
 
+  const headers = {
+    apikey: key,
+    'Content-Type': 'application/json',
+    ...(options.prefer ? { Prefer: options.prefer } : {}),
+  };
+  if (key.split('.').length === 3) headers.Authorization = `Bearer ${key}`;
+
   const response = await fetch(`${config.url}${path}`, {
     method: options.method || 'GET',
-    headers: {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-      'Content-Type': 'application/json',
-      ...(options.prefer ? { Prefer: options.prefer } : {}),
-    },
+    headers,
     ...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
   });
 
